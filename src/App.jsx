@@ -4,8 +4,8 @@ import TourismMap from './TourismMap.jsx';
 import {governorates} from './data/governorates.js';
 import {attractions} from './data/tourism.js';
 import PlaceExperience from './PlaceExperience.jsx';
-const groups=[{id:'all',label:'كل المواقع'},{id:'history',label:'تاريخ وآثار'},{id:'nature',label:'طبيعة ومغامرة'},{id:'religion',label:'ديني وثقافي'},{id:'sea',label:'بحر واستجمام'}];
-const groupMatch=(p,g)=>g==='all'||(g==='history'&&/أثري|تاريخ|قلعة|تراث/.test(p.type))||(g==='nature'&&/طبيعة|مغامرة|حياة برية|طيور/.test(p.type))||(g==='religion'&&/ديني|متحف|ثقافة/.test(p.type))||(g==='sea'&&/بحر|استجمام|غوص/.test(p.type));
+const groups=[{id:'all',label:'كل المواقع'},{id:'museums',label:'المتاحف'},{id:'history',label:'تاريخ وآثار'},{id:'nature',label:'طبيعة ومغامرة'},{id:'religion',label:'ديني وثقافي'},{id:'sea',label:'بحر واستجمام'}];
+const groupMatch=(p,g)=>g==='all'||(g==='museums'&&/متحف/.test(p.type))||(g==='history'&&/أثري|تاريخ|قلعة|تراث/.test(p.type))||(g==='nature'&&/طبيعة|مغامرة|حياة برية|طيور/.test(p.type))||(g==='religion'&&/ديني|متحف|ثقافة/.test(p.type))||(g==='sea'&&/بحر|استجمام|غوص/.test(p.type));
 export default function App(){
  const [selectedGov,setSelectedGov]=useState(null),[selectedPlace,setSelectedPlace]=useState(null),[query,setQuery]=useState(''),[group,setGroup]=useState('all');
  const visiblePlaces=useMemo(()=>attractions.filter(p=>(!selectedGov||p.gov===selectedGov.id)&&groupMatch(p,group)&&(!query||p.name.includes(query)||p.description.includes(query)||p.type.includes(query))),[selectedGov,group,query]);
