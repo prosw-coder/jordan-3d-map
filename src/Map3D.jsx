@@ -1,5 +1,5 @@
-import React, {useEffect,useMemo,useState} from 'react';
-import {Canvas} from '@react-three/fiber';
+import React, {useEffect,useMemo,useState,useRef} from 'react';
+import {Canvas, useFrame} from '@react-three/fiber';
 import {OrbitControls, Float} from '@react-three/drei';
 import * as THREE from 'three';
 import {governorates} from './data/governorates.js';
@@ -18,11 +18,11 @@ function Region({feature,index,selected,onSelect}) {
  {shapes.map((shape,i)=><mesh key={i} position={[0,selectedNow?0.18:0,0]} rotation={[-Math.PI/2,0,0]} castShadow receiveShadow><extrudeGeometry args={[shape,{depth:selectedNow?0.23:0.13,bevelEnabled:true,bevelSegments:2,steps:1,bevelSize:0.035,bevelThickness:0.035}]} /><meshStandardMaterial color={selectedNow?'#d7b878':color} roughness={0.72} metalness={0.08}/></mesh>)}
  </group>;
 }
-function Scene({features,selected,onSelect}) { return <>
+function Scene({features,selected,onSelect}) {\n const controls=useRef();\n const selectedFeature=features.find((f,i)=>findRecord(f,i)?.id===selected);\n const center=useMemo(()=>{if(!selectedFeature)return [0,0];const coords=selectedFeature.geometry.type==='Polygon'?selectedFeature.geometry.coordinates.flat(1):selectedFeature.geometry.coordinates.flat(2);let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;coords.forEach(p=>{const [x,y]=project(p);minX=Math.min(minX,x);maxX=Math.max(maxX,x);minY=Math.min(minY,y);maxY=Math.max(maxY,y);});return [(minX+maxX)/2,-(minY+maxY)/2];},[selectedFeature]);\n useFrame(({camera})=>{if(!controls.current)return;const target=new THREE.Vector3(center[0],0,center[1]);const desired=selectedFeature?new THREE.Vector3(center[0]+0.4,5.8,center[1]+6.2):new THREE.Vector3(0,8,11);controls.current.target.lerp(target,0.055);camera.position.lerp(desired,0.055);controls.current.update();});\n return <>
  <ambientLight intensity={1.5}/><directionalLight position={[5,9,6]} intensity={2.1} castShadow/><pointLight position={[-5,3,-4]} intensity={1.2} color="#d4b779"/>
  <mesh rotation={[-Math.PI/2,0,0]} position={[0,-0.18,0]} receiveShadow><planeGeometry args={[30,30]}/><meshStandardMaterial color="#102b27" roughness={1}/></mesh>
  <Float speed={0.6} rotationIntensity={0.015} floatIntensity={0.08}><group position={[0,0.04,0]}>{features.map((f,i)=><Region key={i} feature={f} index={i} selected={selected} onSelect={onSelect}/>)}</group></Float>
- <OrbitControls makeDefault enablePan={true} minDistance={5} maxDistance={19} minPolarAngle={0.25} maxPolarAngle={1.48} target={[0,0,0]}/>
+ <OrbitControls ref={controls} makeDefault enablePan={true} minDistance={4} maxDistance={19} minPolarAngle={0.25} maxPolarAngle={1.48} target={[0,0,0]}/>
  </>; }
 export default function Map3D({selected,onSelect}) {
  const [features,setFeatures]=useState([]); const [status,setStatus]=useState('loading');
