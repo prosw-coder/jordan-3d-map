@@ -3,7 +3,7 @@ import {Canvas,useFrame} from '@react-three/fiber';
 import {OrbitControls,Float} from '@react-three/drei';
 import * as THREE from 'three';
 import {governorates} from './data/governorates.js';
-const DATA_URL='https://www.geoboundaries.org/api/current/gbOpen/JOR/ADM1/';
+const DATA_URL='/api/boundaries';
 const SCALE=1.6;
 const project=([lon,lat])=>[(lon-36.8)*SCALE,(lat-31.2)*SCALE];
 const polygons=g=>!g?[]:g.type==='Polygon'?[g.coordinates]:g.type==='MultiPolygon'?g.coordinates:[];
@@ -28,6 +28,6 @@ function Scene({features,selected,onSelect}){
 }
 export default function Map3D({selected,onSelect}){
  const [features,setFeatures]=useState([]);const [status,setStatus]=useState('loading');
- useEffect(()=>{let active=true;(async()=>{try{const mr=await fetch(DATA_URL);if(!mr.ok)throw Error('Boundary metadata unavailable');const meta=await mr.json();const url=meta.gjDownloadURL||meta.staticDownloadLink||meta.downloadURL;if(!url)throw Error('GeoJSON URL missing');const gr=await fetch(url);if(!gr.ok)throw Error('GeoJSON unavailable');const geo=await gr.json();if(!Array.isArray(geo.features)||geo.features.length!==12)throw Error('Expected 12 governorates');if(active){setFeatures(geo.features);setStatus('ready')}}catch(e){console.error('Jordan boundaries:',e);if(active)setStatus('error')}})();return()=>{active=false}},[]);
+ useEffect(()=>{let active=true;(async()=>{try{const response=await fetch(DATA_URL,{headers:{Accept:'application/geo+json, application/json'}});if(!response.ok)throw Error('Boundary service returned '+response.status);const geo=await response.json();if(!Array.isArray(geo.features)||geo.features.length<12)throw Error('Jordan governorates data is incomplete');if(active){setFeatures(geo.features);setStatus('ready')}}catch(e){console.error('Jordan boundaries:',e);if(active)setStatus('error')}})();return()=>{active=false}},[]);
  return <div className="map-stage"><Canvas shadows camera={{position:[0,8,11],fov:38}} dpr={[1,1.7]}><color attach="background" args={['#0b211e']}/><fog attach="fog" args={['#0b211e',17,28]}/>{features.length>0&&<Scene features={features} selected={selected} onSelect={onSelect}/>}</Canvas>{status==='loading'&&<div className="map-message"><span className="loader"/> جارٍ تحميل الحدود الجغرافية للمحافظات…</div>}{status==='error'&&<div className="map-message">تعذّر تحميل بيانات الحدود الآن. تحقق من الاتصال ثم أعد تحميل الصفحة.</div>}<div className="map-hint">اسحب للتدوير · قرّب بإصبعين أو عجلة الفأرة · اضغط على محافظة</div></div>
 }
