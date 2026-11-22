@@ -1,5 +1,5 @@
 import React,{useEffect,useRef,useState} from 'react';
-import maplibregl from 'maplibre-gl';
+import maplibregl,{setRTLTextPlugin} from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import {governorates} from './data/governorates.js';
 import {attractions} from './data/tourism.js';
@@ -9,6 +9,7 @@ export default function TourismMap({selectedGov,onSelectGov,selectedPlace,onSele
  const host=useRef(null),mapRef=useRef(null),ready=useRef(false),[mapError,setMapError]=useState('');
  useEffect(()=>{
   if(!host.current||mapRef.current)return;
+  try{setRTLTextPlugin('https://unpkg.com/@mapbox/mapbox-gl-rtl-text@0.3.0/dist/mapbox-gl-rtl-text.js',null,true)}catch(e){};
   const map=new maplibregl.Map({container:host.current,style:'https://tiles.openfreemap.org/styles/liberty',center:[36.15,31.25],zoom:6.15,pitch:56,bearing:-7,antialias:true,attributionControl:true});
   mapRef.current=map;
   map.addControl(new maplibregl.NavigationControl({visualizePitch:true}), 'top-left');
@@ -18,7 +19,7 @@ export default function TourismMap({selectedGov,onSelectGov,selectedPlace,onSele
    try{
     map.addSource('terrain-dem',{type:'raster-dem',tiles:['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],tileSize:256,maxzoom:15,encoding:'terrarium'});
     map.setTerrain({source:'terrain-dem',exaggeration:1.35});
-    map.addLayer({id:'terrain-shade',type:'hillshade',source:'terrain-dem',paint:{'hillshade-exaggeration':0.32,'hillshade-shadow-color':'#26372f','hillshade-highlight-color':'#d4c49c'}},'waterway-label');
+    const hillshade={id:'terrain-shade',type:'hillshade',source:'terrain-dem',paint:{'hillshade-exaggeration':0.32,'hillshade-shadow-color':'#26372f','hillshade-highlight-color':'#d4c49c'}};const firstSymbol=map.getStyle().layers.find(layer=>layer.type==='symbol')?.id;if(firstSymbol)map.addLayer(hillshade,firstSymbol);else map.addLayer(hillshade);
     const res=await fetch('/api/boundaries');
     if(!res.ok)throw new Error('boundary '+res.status);
     const geo=await res.json();
@@ -27,10 +28,10 @@ export default function TourismMap({selectedGov,onSelectGov,selectedPlace,onSele
     map.addLayer({id:'governorates-fill',type:'fill',source:'governorates',paint:{'fill-color':['match',['get','govId'],'amman','#c3a06c','irbid','#779b78','ajloun','#789c7a','jerash','#bd9367','balqa','#d1b878','mafraq','#a99a79','zarqa','#8da39a','madaba','#c6a47c','karak','#ad8069','tafilah','#879b7b','maan','#c19b6b','aqaba','#69999a','#82978b'],'fill-opacity':0.22}});
     map.addLayer({id:'governorates-outline',type:'line',source:'governorates',paint:{'line-color':'#e6d2a4','line-width':1.5,'line-opacity':0.9}});
     map.addSource('gov-labels',{type:'geojson',data:collection(governorates.map(g=>({id:g.id,name:g.name,coords:g.center})))});
-    map.addLayer({id:'gov-labels',type:'symbol',source:'gov-labels',layout:{'text-field':['get','name'],'text-font':['Noto Sans Arabic Regular','Noto Sans Regular'],'text-size':13,'text-allow-overlap':false,'text-ignore-placement':false},paint:{'text-color':'#fff8e8','text-halo-color':'#10231e','text-halo-width':2}});
+    map.addLayer({id:'gov-labels',type:'symbol',source:'gov-labels',layout:{'text-field':['get','name'],'text-font':['Noto Sans Arabic UI Regular','Noto Sans Regular'],'text-size':13,'text-allow-overlap':false,'text-ignore-placement':false},paint:{'text-color':'#fff8e8','text-halo-color':'#10231e','text-halo-width':2}});
     map.addSource('attractions',{type:'geojson',data:collection(attractions)});
     map.addLayer({id:'attraction-points',type:'circle',source:'attractions',paint:{'circle-radius':['interpolate',['linear'],['zoom'],5,4,9,7,13,9],'circle-color':'#d8b777','circle-stroke-color':'#fff6dd','circle-stroke-width':1.5,'circle-opacity':0.98}});
-    map.addLayer({id:'attraction-labels',type:'symbol',source:'attractions',minzoom:6.3,layout:{'text-field':['get','name'],'text-font':['Noto Sans Arabic Regular','Noto Sans Regular'],'text-size':11,'text-offset':[0,1.25],'text-anchor':'top','text-optional':true},paint:{'text-color':'#fff4d8','text-halo-color':'#10231e','text-halo-width':2}});
+    map.addLayer({id:'attraction-labels',type:'symbol',source:'attractions',minzoom:6.3,layout:{'text-field':['get','name'],'text-font':['Noto Sans Arabic UI Regular','Noto Sans Regular'],'text-size':11,'text-offset':[0,1.25],'text-anchor':'top','text-optional':true},paint:{'text-color':'#fff4d8','text-halo-color':'#10231e','text-halo-width':2}});
     map.on('click','attraction-points',e=>{const id=e.features?.[0]?.properties?.id;const p=attractions.find(x=>x.id===id);if(p)onSelectPlace(p)});
     map.on('mouseenter','attraction-points',()=>map.getCanvas().style.cursor='pointer');
     map.on('mouseleave','attraction-points',()=>map.getCanvas().style.cursor='');
