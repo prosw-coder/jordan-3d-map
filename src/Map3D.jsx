@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import {governorates} from './data/governorates.js';
 
 const DATA_URL='https://www.geoboundaries.org/api/current/gbOpen/JOR/ADM1/';
-function project([lon,lat]) { return [(lon-36.8)*0.105, (lat-29.2)*0.105]; }
+function project([lon,lat]) { return [(lon-36.8)*1.6, (lat-31.2)*1.6]; }
 function ringToShape(ring) { const s=new THREE.Shape(); ring.forEach((p,i)=>{const [x,y]=project(p); if(i===0)s.moveTo(x,y);else s.lineTo(x,y);}); s.closePath(); return s; }
 function Region({feature,index,selected,onSelect}) {
  const name=feature.properties?.shapeName||feature.properties?.NAME_1||feature.properties?.name||'';
