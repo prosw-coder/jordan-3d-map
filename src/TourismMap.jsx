@@ -20,11 +20,11 @@ const settlements=[
 {name:'العقبة',coords:[35.00,29.53]},{name:'القويرة',coords:[35.31,29.82]},{name:'الديسة',coords:[35.48,29.66]}
 ];
 export default function TourismMap({selectedGov,onSelectGov,selectedPlace,onSelectPlace}){
- const host=useRef(null),mapRef=useRef(null),ready=useRef(false),[mapReady,setMapReady]=useState(false),[mapError,setMapError]=useState('');
+ const host=useRef(null),mapRef=useRef(null),ready=useRef(false),[mapReady,setMapReady]=useState(false),[mapError,setMapError]=useState(''),[is3D,setIs3D]=useState(true);
  useEffect(()=>{
   if(!host.current||mapRef.current)return;
   try{setRTLTextPlugin('https://unpkg.com/@mapbox/mapbox-gl-rtl-text@0.3.0/dist/mapbox-gl-rtl-text.js',null,true)}catch(e){};
-  const map=new maplibregl.Map({container:host.current,style:'https://tiles.openfreemap.org/styles/liberty',center:[36.15,31.25],zoom:6.15,pitch:56,bearing:-7,antialias:true,attributionControl:true});
+  const map=new maplibregl.Map({container:host.current,style:'https://tiles.openfreemap.org/styles/liberty',center:[36.15,31.25],zoom:6.35,pitch:68,bearing:-9,antialias:true,attributionControl:true});
   mapRef.current=map;
   map.addControl(new maplibregl.NavigationControl({visualizePitch:true}), 'top-left');
   map.on('error',e=>{if(!ready.current&&e?.error)setMapError('قد يتأخر تحميل طبقات الخريطة حسب الاتصال بالإنترنت.')});
@@ -32,7 +32,7 @@ export default function TourismMap({selectedGov,onSelectGov,selectedPlace,onSele
    ready.current=true;
    try{
     map.addSource('terrain-dem',{type:'raster-dem',tiles:['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'],tileSize:256,maxzoom:15,encoding:'terrarium'});
-    map.setTerrain({source:'terrain-dem',exaggeration:1.35});
+    map.setTerrain({source:'terrain-dem',exaggeration:2.05});\n    try{map.setFog({color:'#d8e1d4','high-color':'#7f9c91','horizon-blend':0.12,'space-color':'#10251f','star-intensity':0.08})}catch(e){}\n    const vectorSource=Object.keys(map.getStyle().sources||{}).find(k=>map.getStyle().sources[k].type==='vector');\n    if(vectorSource){try{map.addLayer({id:'jordan-3d-buildings',type:'fill-extrusion',source:vectorSource,'source-layer':'building',minzoom:13.2,filter:['all',['!=',['get','hide_3d'],true]],paint:{'fill-extrusion-color':['interpolate',['linear'],['coalesce',['get','render_height'],['get','height'],8],0,'#b9a98a',35,'#8f927e',100,'#737f73'],'fill-extrusion-height':['coalesce',['get','render_height'],['get','height'],8],'fill-extrusion-base':['coalesce',['get','render_min_height'],['get','min_height'],0],'fill-extrusion-opacity':0.88,'fill-extrusion-vertical-gradient':true}})}catch(e){console.info('3D buildings layer unavailable',e)}}
     const hillshade={id:'terrain-shade',type:'hillshade',source:'terrain-dem',paint:{'hillshade-exaggeration':0.32,'hillshade-shadow-color':'#26372f','hillshade-highlight-color':'#d4c49c'}};const firstSymbol=map.getStyle().layers.find(layer=>layer.type==='symbol')?.id;if(firstSymbol)map.addLayer(hillshade,firstSymbol);else map.addLayer(hillshade);
     const res=await fetch('/api/boundaries');
     if(!res.ok)throw new Error('boundary '+res.status);
@@ -62,7 +62,8 @@ export default function TourismMap({selectedGov,onSelectGov,selectedPlace,onSele
   });
   return()=>{map.remove();mapRef.current=null;ready.current=false};
  },[]);
- useEffect(()=>{const map=mapRef.current;if(!map||!mapReady||!selectedGov||!map.getLayer('governorates-fill'))return;map.setPaintProperty('governorates-fill','fill-opacity',['case',['==',['get','govId'],selectedGov.id],0.58,0.12]);map.flyTo({center:selectedGov.center,zoom:8.1,pitch:62,duration:1500,essential:true})},[selectedGov,mapReady]);
- useEffect(()=>{const map=mapRef.current;if(!map||!mapReady)return;const source=map.getSource('attractions');if(!source)return;const features=map.querySourceFeatures('attractions');features.forEach(f=>{if(f.properties?.id)map.setFeatureState({source:'attractions',id:f.properties.id},{selected:!!selectedPlace&&f.properties.id===selectedPlace.id})});if(selectedPlace)map.flyTo({center:selectedPlace.coords,zoom:10.5,pitch:64,duration:1500,essential:true})},[selectedPlace,mapReady]);
- return <div className="real-map-wrap"><div ref={host} className="real-map-canvas"/>{mapError&&<div className="map-status">{mapError}</div>}<div className="terrain-chip">تضاريس ثلاثية الأبعاد · أسماء عربية · مواقع سياحية</div></div>;
+ useEffect(()=>{const map=mapRef.current;if(!map||!mapReady||!selectedGov||!map.getLayer('governorates-fill'))return;map.setPaintProperty('governorates-fill','fill-opacity',['case',['==',['get','govId'],selectedGov.id],0.58,0.12]);map.flyTo({center:selectedGov.center,zoom:8.1,pitch:is3D?68:0,bearing:is3D?-9:0,duration:1500,essential:true})},[selectedGov,mapReady,is3D]);
+ useEffect(()=>{const map=mapRef.current;if(!map||!mapReady)return;const source=map.getSource('attractions');if(!source)return;const features=map.querySourceFeatures('attractions');features.forEach(f=>{if(f.properties?.id)map.setFeatureState({source:'attractions',id:f.properties.id},{selected:!!selectedPlace&&f.properties.id===selectedPlace.id})});if(selectedPlace)map.flyTo({center:selectedPlace.coords,zoom:10.5,pitch:is3D?68:0,bearing:is3D?-9:0,duration:1500,essential:true})},[selectedPlace,mapReady,is3D]);
+ const toggleDimension=()=>{const map=mapRef.current;if(!map||!mapReady)return;const next=!is3D;setIs3D(next);if(next){map.setTerrain({source:'terrain-dem',exaggeration:2.05});map.easeTo({pitch:68,bearing:-9,duration:1000,essential:true})}else{map.setTerrain(null);map.easeTo({pitch:0,bearing:0,duration:1000,essential:true})}};
+ return <div className="real-map-wrap"><div ref={host} className="real-map-canvas"/>{mapError&&<div className="map-status">{mapError}</div>}<div className="terrain-chip">{is3D?'تضاريس ثلاثية الأبعاد':'عرض مسطح ثنائي الأبعاد'} · أسماء عربية · مواقع سياحية</div><button className="dimension-toggle" onClick={toggleDimension} disabled={!mapReady}><span className={is3D?'dimension-icon active':'dimension-icon'}>3D</span><span>{is3D?'إيقاف 3D':'تفعيل 3D'}</span></button></div>;
 }
