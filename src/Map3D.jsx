@@ -1,6 +1,6 @@
 import React, {useEffect,useMemo,useState} from 'react';
 import {Canvas} from '@react-three/fiber';
-import {OrbitControls, Float, Html} from '@react-three/drei';
+import {OrbitControls, Float} from '@react-three/drei';
 import * as THREE from 'three';
 import {governorates} from './data/governorates.js';
 
@@ -26,7 +26,7 @@ function Scene({features,selected,onSelect}) { return <>
  </>; }
 export default function Map3D({selected,onSelect}) {
  const [features,setFeatures]=useState([]); const [status,setStatus]=useState('loading');
- useEffect(()=>{let alive=true;(async()=>{try{const meta=await fetch(DATA_URL).then(r=>{if(!r.ok)throw Error('boundary metadata unavailable');return r.json()});const url=meta gjDownloadURL||meta gjDownloadURL||meta.downloadURL; if(!url)throw Error('No GeoJSON URL');const geo=await fetch(url).then(r=>{if(!r.ok)throw Error('GeoJSON unavailable');return r.json()});if(alive){setFeatures(geo.features||[]);setStatus('ready');}}catch(e){console.error(e);if(alive)setStatus('error');}})();return()=>{alive=false};},[]);
+ useEffect(()=>{let alive=true;(async()=>{try{const meta=await fetch(DATA_URL).then(r=>{if(!r.ok)throw Error('boundary metadata unavailable');return r.json()});const url=meta.gjDownloadURL||meta.staticDownloadLink||meta.downloadURL; if(!url)throw Error('No GeoJSON URL');const geo=await fetch(url).then(r=>{if(!r.ok)throw Error('GeoJSON unavailable');return r.json()});if(alive){setFeatures(geo.features||[]);setStatus('ready');}}catch(e){console.error(e);if(alive)setStatus('error');}})();return()=>{alive=false};},[]);
  return <div className="map-stage"><Canvas shadows camera={{position:[0,8,11],fov:38}} dpr={[1,1.7]}><color attach="background" args={['#0b211e']}/><fog attach="fog" args={['#0b211e',17,28]}/>{features.length>0&&<Scene features={features} selected={selected} onSelect={onSelect}/>}</Canvas>
  {status==='loading'&&<div className="map-message"><span className="loader"/> جارٍ تحميل الحدود الجغرافية للمحافظات…</div>}
  {status==='error'&&<div className="map-message">تعذّر تحميل بيانات الحدود الآن. تحقق من الاتصال ثم أعد تحميل الصفحة.</div>}
