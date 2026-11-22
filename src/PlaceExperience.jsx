@@ -1,0 +1,23 @@
+import React,{useEffect,useState} from 'react';
+import {ChevronLeft,ChevronRight,X,Expand,MapPin,Clock3,CalendarDays,Image as ImageIcon,LoaderCircle,ExternalLink} from 'lucide-react';
+export default function PlaceExperience({place,governorate}){
+ const [photos,setPhotos]=useState([]),[loading,setLoading]=useState(true),[error,setError]=useState(''),[active,setActive]=useState(0),[lightbox,setLightbox]=useState(false);
+ useEffect(()=>{let live=true;setPhotos([]);setActive(0);setLoading(true);setError('');
+ fetch('/api/gallery?q='+encodeURIComponent(place.galleryQuery||place.name+' Jordan')).then(r=>{if(!r.ok)throw new Error('تعذّر جلب الصور');return r.json()}).then(data=>{if(live){setPhotos(data.images||[]);if(!data.images?.length)setError('لم نعثر حالياً على صور مرخّصة كافية لهذا الموقع.');}}).catch(()=>{if(live)setError('تعذّر تحميل معرض الصور حالياً. حاول تحديث الصفحة لاحقاً.')}).finally(()=>{if(live)setLoading(false)});
+ return()=>{live=false};
+ },[place.id,place.galleryQuery,place.name]);
+ const change=n=>setActive((n+photos.length)%photos.length);
+ useEffect(()=>{if(!lightbox)return;const onKey=e=>{if(e.key==='Escape')setLightbox(false);if(e.key==='ArrowRight')change(active+1);if(e.key==='ArrowLeft')change(active-1)};window.addEventListener('keydown',onKey);return()=>window.removeEventListener('keydown',onKey)},[lightbox,active,photos.length]);
+ return <article className="experience-panel" id="place-story">
+  <div className="experience-heading"><div><div className="detail-kicker">حكاية المكان · {governorate?.name||'الأردن'}</div><h2>{place.name}</h2><p>{place.type}</p></div><a className="experience-map-link" href={'https://www.google.com/maps/search/?api=1&query='+place.coords[1]+','+place.coords[0]} target="_blank" rel="noreferrer"><MapPin size={15}/> الموقع على الخريطة <ExternalLink size={13}/></a></div>
+  <div className="story-copy"><div className="story-ornament">“</div><p>{place.story||place.description}</p></div>
+  <div className="experience-facts"><div><Clock3 size={16}/><span><small>المدة المقترحة</small><b>{place.duration}</b></span></div><div><CalendarDays size={16}/><span><small>أفضل موسم مقترح</small><b>{place.season}</b></span></div><div><MapPin size={16}/><span><small>المحافظة</small><b>{governorate?.name||'—'}</b></span></div></div>
+  <div className="gallery-heading"><div><div className="eyebrow">معرض الصور</div><h3>شاهد تفاصيل {place.name}</h3><p>صور من ويكيميديا كومنز، مع إظهار مصدر كل صورة وترخيصها.</p></div><span className="gallery-counter">{photos.length} صور</span></div>
+  {loading?<div className="gallery-state"><LoaderCircle className="gallery-spinner" size={24}/> جارٍ البحث عن صور عالية الدقة…</div>:error?<div className="gallery-state"><ImageIcon size={22}/>{error}</div>:<><div className="gallery-feature">
+   <button className="gallery-main-image" onClick={()=>setLightbox(true)} aria-label="تكبير الصورة"><img src={photos[active]?.url} alt={photos[active]?.title||place.name} loading="lazy"/><span className="expand-chip"><Expand size={15}/> تكبير الصورة</span><span className="image-index">{active+1} / {photos.length}</span></button>
+   <div className="gallery-thumbs">{photos.map((p,i)=><button key={p.pageid||p.url} onClick={()=>setActive(i)} className={active===i?'active':''}><img src={p.thumb||p.url} alt={p.title||place.name} loading="lazy"/></button>)}</div>
+  </div><div className="gallery-credit">{photos[active]?.artist&&<span>تصوير: {photos[active].artist}</span>}<a href={photos[active]?.source} target="_blank" rel="noreferrer">مصدر الصورة والترخيص <ExternalLink size={12}/></a></div></>}
+  <div className="visit-note">ملاحظة: الصور المتاحة تختلف حسب الموقع. قد تظهر صور أقل من 5 عندما لا تتوفر صور موثوقة أو مناسبة؛ لن نملأ المعرض بصور غير مرتبطة بالمكان.</div>
+  {lightbox&&photos[active]&&<div className="gallery-lightbox" role="dialog" aria-modal="true" onClick={()=>setLightbox(false)}><button className="lightbox-close" onClick={()=>setLightbox(false)} aria-label="إغلاق"><X size={23}/></button><button className="lightbox-prev" onClick={e=>{e.stopPropagation();change(active-1)}} aria-label="السابق"><ChevronRight size={28}/></button><img src={photos[active].url} alt={photos[active].title||place.name} onClick={e=>e.stopPropagation()}/><button className="lightbox-next" onClick={e=>{e.stopPropagation();change(active+1)}} aria-label="التالي"><ChevronLeft size={28}/></button><div className="lightbox-caption">{photos[active].title} · {active+1} / {photos.length}</div></div>}
+ </article>;
+}
