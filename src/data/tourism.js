@@ -57,6 +57,10 @@ const attractionsRaw = [
 {id:'aqaba-marine',gov:'aqaba',name:'محمية العقبة البحرية',type:'بحر وغوص',description:'شعاب مرجانية وموائل بحرية على ساحل خليج العقبة، مع أنشطة غوص وسنوركل مرخصة.',coords:[34.975,29.420],duration:'2–4 ساعات',season:'طوال العام'},
 {id:'south-beach',gov:'aqaba',name:'الشاطئ الجنوبي',type:'بحر واستجمام',description:'ساحل البحر الأحمر ومواقع للسباحة والغطس ومشاهدة الشعاب المرجانية.',coords:[34.970,29.410],duration:'2–4 ساعات',season:'الربيع والخريف'},
 {id:'tala-bay',gov:'aqaba',name:'تالا باي – خليج تال',type:'بحر واستجمام',description:'منطقة منتجعات وشاطئ وأنشطة بحرية جنوب مدينة العقبة.',coords:[34.963,29.405],duration:'نصف يوم',season:'طوال العام'}
+{id:'national-gallery',gov:'amman',name:'المتحف الوطني الأردني للفنون الجميلة',type:'متحف وفنون',description:'مؤسسة فنية تعرض مجموعات من الفن الحديث والمعاصر من الأردن والمنطقة والعالم.',coords:[35.916,31.953],duration:'1–2 ساعة',season:'طوال العام'},
+{id:'parliament-museum',gov:'amman',name:'متحف الحياة البرلمانية',type:'متحف وثقافة',description:'يوثق محطات من الحياة البرلمانية والدستورية في الأردن داخل مبنى تاريخي مرتبط بتاريخ الدولة.',coords:[35.910,31.954],duration:'45–60 دقيقة',season:'تحقق من مواعيد الزيارة'},
+{id:'aqaba-museum',gov:'aqaba',name:'متحف آثار العقبة',type:'متحف وآثار',description:'يعرض قطعاً أثرية وشواهد من تاريخ العقبة ودورها التجاري والحضاري عبر العصور.',coords:[35.002,29.526],duration:'45–60 دقيقة',season:'تحقق من مواعيد الزيارة'},
+{id:'madaba-museum',gov:'madaba',name:'متحف مادبا الأثري',type:'متحف وآثار',description:'يعرض مكتشفات وفسيفساء ومواد أثرية مرتبطة بتاريخ مادبا والمنطقة المحيطة بها.',coords:[35.797,31.716],duration:'45–60 دقيقة',season:'تحقق من مواعيد الزيارة'}
 ];
 const galleryQueries = {
   "umm-qais": "Umm Qais Gadara Jordan",
@@ -98,6 +102,10 @@ const galleryQueries = {
   "jordan-museum": "Jordan Museum Amman",
   "iraq-al-amir": "Iraq al Amir Qasr al Abd Jordan",
   "royal-auto": "Royal Automobile Museum Amman",
+  "national-gallery": "Jordan National Gallery of Fine Arts Amman",
+  "parliament-museum": "Museum of Parliamentary Life Amman Jordan",
+  "aqaba-museum": "Aqaba Archaeological Museum Jordan",
+  "madaba-museum": "Madaba Archaeological Museum Jordan",
   "karak-castle": "Karak Castle Jordan",
   "wadi-bin-hammad": "Wadi Bin Hammad Jordan",
   "mujib": "Mujib Biosphere Reserve Jordan",
