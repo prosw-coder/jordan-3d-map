@@ -15,7 +15,7 @@ function Region({feature,index,selected,onSelect}){
  const shapes=useMemo(()=>polygons(geometry).flatMap(poly=>{if(!poly?.[0])return[];const s=toShape(poly[0]);poly.slice(1).forEach(h=>s.holes.push(toShape(h)));return[s]}),[geometry]);
  const center=useMemo(()=>{const pts=polygons(geometry).flat(2).filter(p=>Array.isArray(p)&&typeof p[0]==='number');if(!pts.length)return[0,.1,0];const avg=pts.reduce((a,p)=>[a[0]+p[0]/pts.length,a[1]+p[1]/pts.length],[0,0]);const [x,y]=project(avg);return[x,.1,-y]},[geometry]);
  return <group onClick={e=>{e.stopPropagation();onSelect({...record,center})}}>
- {shapes.map((shape,i)=><mesh key={i} position={[0,selected?.id===record?.id?.18:0,0]} rotation={[-Math.PI/2,0,0]} castShadow receiveShadow><extrudeGeometry args={[shape,{depth:selected?.id===record?.id?.23:.13,bevelEnabled:true,bevelSegments:2,steps:1,bevelSize:.035,bevelThickness:.035}]}/><meshStandardMaterial color={selected?.id===record?.id?'#d7b878':record?.color||'#9eaa91'} roughness={.72} metalness={.08}/></mesh>)}
+ {shapes.map((shape,i)=><mesh key={i} position={[0,selected?.id===record?.id?0.18:0,0]} rotation={[-Math.PI/2,0,0]} castShadow receiveShadow><extrudeGeometry args={[shape,{depth:selected?.id===record?.id?0.23:0.13,bevelEnabled:true,bevelSegments:2,steps:1,bevelSize:.035,bevelThickness:.035}]}/><meshStandardMaterial color={selected?.id===record?.id?'#d7b878':record?.color||'#9eaa91'} roughness={.72} metalness={.08}/></mesh>)}
  </group>
 }
 function Scene({features,selected,onSelect}){
