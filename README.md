@@ -5,7 +5,7 @@
 ## التقنية
 - Vite + React
 - Three.js / React Three Fiber
-- بيانات الحدود الإدارية للمحافظات مع نسب المصدر والترخيص
+- حدود المحافظات الإدارية من geoBoundaries / Wikimedia
 - جاهز للنشر على Cloudflare Workers Static Assets
 
 ## التشغيل
@@ -14,5 +14,7 @@ npm install
 npm run dev
 ```
 
-## مصدر الحدود
-سيتم تضمين بيانات المحافظات من مشروع Jordan Administrative Boundaries مع الالتزام بترخيص ODbL ونسب بيانات OpenStreetMap عند استخدام تلك البيانات.
+## بيانات الحدود والترخيص
+تُحمّل حدود المحافظات الـ12 من geoBoundaries ADM1 عبر واجهته العامة. بيانات الحدود المعروضة في هذه النسخة تحمل ترخيص Creative Commons Attribution 2.5 Generic وفق بيانات geoBoundaries؛ يجب إبقاء النسبة إلى geoBoundaries وWikimedia عند إعادة الاستخدام. قد تتغير بيانات المصدر أو رابط التنزيل، لذا يجب التحقق منهما قبل الإطلاق التجاري النهائي.
+
+المصدر: https://www.geoboundaries.org/api/current/gbOpen/JOR/ADM1/
