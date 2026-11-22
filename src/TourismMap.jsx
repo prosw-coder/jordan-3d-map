@@ -6,7 +6,7 @@ import {attractions} from './data/tourism.js';
 const matchGov=(feature)=>{const n=String(feature.properties?.shapeName||feature.properties?.NAME_1||feature.properties?.name||'').toLowerCase();return governorates.find(g=>n.includes(g.en.toLowerCase())||g.en.toLowerCase().includes(n)||n.includes(g.name.replace('العاصمة ','').toLowerCase()))?.id||''};
 const collection=(items)=>({type:'FeatureCollection',features:items.map(p=>({type:'Feature',properties:{...p},geometry:{type:'Point',coordinates:p.coords}}))});
 export default function TourismMap({selectedGov,onSelectGov,selectedPlace,onSelectPlace}){
- const host=useRef(null),mapRef=useRef(null),ready=useRef(false),[mapError,setMapError]=useState('');
+ const host=useRef(null),mapRef=useRef(null),ready=useRef(false),[mapReady,setMapReady]=useState(false),[mapError,setMapError]=useState('');
  useEffect(()=>{
   if(!host.current||mapRef.current)return;
   try{setRTLTextPlugin('https://unpkg.com/@mapbox/mapbox-gl-rtl-text@0.3.0/dist/mapbox-gl-rtl-text.js',null,true)}catch(e){};
@@ -38,11 +38,12 @@ export default function TourismMap({selectedGov,onSelectGov,selectedPlace,onSele
     map.on('click','governorates-fill',e=>{const id=e.features?.[0]?.properties?.govId;const g=governorates.find(x=>x.id===id);if(g)onSelectGov(g)});
     map.on('mouseenter','governorates-fill',()=>map.getCanvas().style.cursor='pointer');
     map.on('mouseleave','governorates-fill',()=>map.getCanvas().style.cursor='');
+    ready.current=true;setMapReady(true);
    }catch(err){console.error('Map layers:',err);setMapError('تعذّر تحميل حدود المحافظات. ستبقى خريطة التضاريس متاحة.')};
   });
   return()=>{map.remove();mapRef.current=null;ready.current=false};
  },[]);
- useEffect(()=>{const map=mapRef.current;if(!map||!ready.current||!selectedGov)return;map.setPaintProperty('governorates-fill','fill-opacity',['case',['==',['get','govId'],selectedGov.id],0.58,0.12]);map.flyTo({center:selectedGov.center,zoom:8.1,pitch:62,duration:1500,essential:true})},[selectedGov]);
- useEffect(()=>{const map=mapRef.current;if(!map||!ready.current||!selectedPlace)return;map.flyTo({center:selectedPlace.coords,zoom:10.5,pitch:64,duration:1300,essential:true})},[selectedPlace]);
+ useEffect(()=>{const map=mapRef.current;if(!map||!mapReady||!selectedGov||!map.getLayer('governorates-fill'))return;map.setPaintProperty('governorates-fill','fill-opacity',['case',['==',['get','govId'],selectedGov.id],0.58,0.12]);map.flyTo({center:selectedGov.center,zoom:8.1,pitch:62,duration:1500,essential:true})},[selectedGov,mapReady]);
+ useEffect(()=>{const map=mapRef.current;if(!map||!mapReady||!selectedPlace)return;map.flyTo({center:selectedPlace.coords,zoom:10.5,pitch:64,duration:1300,essential:true})},[selectedPlace,mapReady]);
  return <div className="real-map-wrap"><div ref={host} className="real-map-canvas"/>{mapError&&<div className="map-status">{mapError}</div>}<div className="terrain-chip">تضاريس ثلاثية الأبعاد · أسماء عربية · مواقع سياحية</div></div>;
 }
