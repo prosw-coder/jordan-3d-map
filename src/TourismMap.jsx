@@ -5,6 +5,20 @@ import {governorates} from './data/governorates.js';
 import {attractions} from './data/tourism.js';
 const matchGov=(feature)=>{const n=String(feature.properties?.shapeName||feature.properties?.NAME_1||feature.properties?.name||'').toLowerCase();return governorates.find(g=>n.includes(g.en.toLowerCase())||g.en.toLowerCase().includes(n)||n.includes(g.name.replace('العاصمة ','').toLowerCase()))?.id||''};
 const collection=(items)=>({type:'FeatureCollection',features:items.map(p=>({type:'Feature',properties:{...p},geometry:{type:'Point',coordinates:p.coords}}))});
+const settlements=[
+{name:'إربد',coords:[35.85,32.55]},{name:'الرمثا',coords:[36.00,32.56]},{name:'الحصن',coords:[35.88,32.48]},
+{name:'عجلون',coords:[35.75,32.33]},{name:'عنجرة',coords:[35.71,32.31]},{name:'كفرنجة',coords:[35.66,32.34]},
+{name:'جرش',coords:[35.89,32.28]},{name:'سوف',coords:[35.84,32.36]},{name:'ساكب',coords:[35.82,32.27]},
+{name:'السلط',coords:[35.73,32.04]},{name:'الفحيص',coords:[35.78,32.00]},{name:'دير علا',coords:[35.62,32.20]},
+{name:'المفرق',coords:[36.20,32.34]},{name:'أم الجمال',coords:[36.37,32.33]},{name:'رحاب',coords:[36.10,32.10]},
+{name:'الزرقاء',coords:[36.09,32.07]},{name:'الرصيفة',coords:[36.05,32.02]},{name:'الأزرق',coords:[36.83,31.83]},
+{name:'مادبا',coords:[35.80,31.72]},{name:'ذيبان',coords:[35.78,31.50]},{name:'ماعين',coords:[35.61,31.60]},
+{name:'عمّان',coords:[35.93,31.95]},{name:'ناعور',coords:[35.83,31.88]},{name:'سحاب',coords:[36.00,31.87]},
+{name:'الكرك',coords:[35.70,31.18]},{name:'المزار الجنوبي',coords:[35.70,31.06]},{name:'غور الصافي',coords:[35.47,31.03]},
+{name:'الطفيلة',coords:[35.62,30.84]},{name:'بصيرا',coords:[35.62,30.74]},{name:'القادسية',coords:[35.55,30.80]},
+{name:'معان',coords:[35.73,30.19]},{name:'وادي موسى',coords:[35.48,30.32]},{name:'الشوبك',coords:[35.56,30.52]},
+{name:'العقبة',coords:[35.00,29.53]},{name:'القويرة',coords:[35.31,29.82]},{name:'الديسة',coords:[35.48,29.66]}
+];
 export default function TourismMap({selectedGov,onSelectGov,selectedPlace,onSelectPlace}){
  const host=useRef(null),mapRef=useRef(null),ready=useRef(false),[mapReady,setMapReady]=useState(false),[mapError,setMapError]=useState('');
  useEffect(()=>{
@@ -29,6 +43,8 @@ export default function TourismMap({selectedGov,onSelectGov,selectedPlace,onSele
     map.addLayer({id:'governorates-outline',type:'line',source:'governorates',paint:{'line-color':'#e6d2a4','line-width':1.5,'line-opacity':0.9}});
     map.addSource('gov-labels',{type:'geojson',data:collection(governorates.map(g=>({id:g.id,name:g.name,coords:g.center})))});
     map.addLayer({id:'gov-labels',type:'symbol',source:'gov-labels',layout:{'text-field':['get','name'],'text-font':['Noto Sans Arabic UI Regular','Noto Sans Regular'],'text-size':13,'text-allow-overlap':false,'text-ignore-placement':false},paint:{'text-color':'#fff8e8','text-halo-color':'#10231e','text-halo-width':2}});
+    map.addSource('settlements',{type:'geojson',data:collection(settlements)});
+    map.addLayer({id:'settlement-labels',type:'symbol',source:'settlements',minzoom:7.1,layout:{'text-field':['get','name'],'text-font':['Noto Sans Arabic UI Regular','Noto Sans Regular'],'text-size':10,'text-allow-overlap':false,'text-ignore-placement':false},paint:{'text-color':'#e5eadc','text-halo-color':'#162c26','text-halo-width':2}});
     map.addSource('attractions',{type:'geojson',data:collection(attractions)});
     map.addLayer({id:'attraction-points',type:'circle',source:'attractions',paint:{'circle-radius':['interpolate',['linear'],['zoom'],5,4,9,7,13,9],'circle-color':'#d8b777','circle-stroke-color':'#fff6dd','circle-stroke-width':1.5,'circle-opacity':0.98}});
     map.addLayer({id:'attraction-labels',type:'symbol',source:'attractions',minzoom:6.3,layout:{'text-field':['get','name'],'text-font':['Noto Sans Arabic UI Regular','Noto Sans Regular'],'text-size':11,'text-offset':[0,1.25],'text-anchor':'top','text-optional':true},paint:{'text-color':'#fff4d8','text-halo-color':'#10231e','text-halo-width':2}});
