@@ -1,4 +1,4 @@
-export const attractions = [
+const attractionsRaw = [
 {id:'umm-qais',gov:'irbid',name:'أم قيس (جدارا)',type:'أثري وتاريخي',description:'مدينة أثرية رومانية تطل على بحيرة طبريا ووادي اليرموك، وتضم الشارع المعمّد والمسارح والكنائس القديمة.',coords:[35.683,32.653],duration:'2–3 ساعات',season:'الربيع والخريف'},
 {id:'pella',gov:'irbid',name:'طبقة فحل (بيلا)',type:'أثري وتاريخي',description:'موقع أثري غني بطبقات من العصور البرونزية والرومانية والبيزنطية والإسلامية.',coords:[35.619,32.453],duration:'1–2 ساعة',season:'الربيع والخريف'},
 {id:'himma',gov:'irbid',name:'الحمة الأردنية',type:'طبيعة واستجمام',description:'ينابيع مياه معدنية حارة في شمال الأغوار، مناسبة للاستجمام وفق تعليمات المرافق.',coords:[35.684,32.706],duration:'1–2 ساعة',season:'الشتاء والربيع'},
@@ -58,4 +58,69 @@ export const attractions = [
 {id:'south-beach',gov:'aqaba',name:'الشاطئ الجنوبي',type:'بحر واستجمام',description:'ساحل البحر الأحمر ومواقع للسباحة والغطس ومشاهدة الشعاب المرجانية.',coords:[34.970,29.410],duration:'2–4 ساعات',season:'الربيع والخريف'},
 {id:'tala-bay',gov:'aqaba',name:'تالا باي – خليج تال',type:'بحر واستجمام',description:'منطقة منتجعات وشاطئ وأنشطة بحرية جنوب مدينة العقبة.',coords:[34.963,29.405],duration:'نصف يوم',season:'طوال العام'}
 ];
+const galleryQueries = {
+  "umm-qais": "Umm Qais Gadara Jordan",
+  "pella": "Pella Tell Husn Jordan archaeological site",
+  "himma": "Himma hot springs Jordan",
+  "beit-ras": "Capitolias Beit Ras Jordan ruins",
+  "dar-saraya": "Dar al Saraya Irbid museum",
+  "ajloun-castle": "Ajloun Castle Jordan",
+  "ajloun-forest": "Ajloun Forest Reserve Jordan",
+  "mar-elias": "Mar Elias Ajloun Jordan",
+  "ajloun-cable": "Ajloun cable car Jordan",
+  "anjara": "Our Lady of the Mountain Anjara Jordan",
+  "jerash-ruins": "Jerash Gerasa archaeological site Jordan",
+  "dibbeen": "Dibeen Forest Reserve Jordan",
+  "souf": "Souf forests Jerash Jordan",
+  "jerash-museum": "Jerash Archaeological Museum Jordan",
+  "salt-old-town": "As Salt old town Jordan",
+  "salt-museum": "Salt Historical Museum Jordan",
+  "baptism": "Baptism Site Bethany Beyond the Jordan",
+  "wadi-shuaib": "Wadi Shuaib Jordan",
+  "zai": "Zai Jordan Balqa",
+  "umm-jimal": "Umm el Jimal Jordan",
+  "rehab": "Rehab archaeological site Mafraq Jordan",
+  "burqu": "Burqu Nature Reserve Jordan",
+  "dair-kahf": "Deir al Kahf Jordan",
+  "safawi": "Safawi Badia Jordan",
+  "qasr-amra": "Qasr Amra Jordan",
+  "qasr-kharana": "Qasr Kharana Jordan",
+  "qasr-hallabat": "Qasr al Hallabat Jordan",
+  "azraq-wetland": "Azraq Wetland Reserve Jordan",
+  "shawmari": "Shaumari Wildlife Reserve Jordan",
+  "madaba-map": "Madaba Map St George Church Jordan",
+  "mount-nebo": "Mount Nebo Jordan",
+  "main-hot": "Ma in Hot Springs Jordan",
+  "mukawir": "Machaerus Mukawir Jordan",
+  "umm-ar-rasas": "Umm ar Rasas Jordan",
+  "amman-citadel": "Amman Citadel Jordan",
+  "roman-theatre": "Roman Theatre Amman Jordan",
+  "jordan-museum": "Jordan Museum Amman",
+  "iraq-al-amir": "Iraq al Amir Qasr al Abd Jordan",
+  "royal-auto": "Royal Automobile Museum Amman",
+  "karak-castle": "Karak Castle Jordan",
+  "wadi-bin-hammad": "Wadi Bin Hammad Jordan",
+  "mujib": "Mujib Biosphere Reserve Jordan",
+  "lot-cave": "Lot Cave Ghor Safi Jordan",
+  "dana": "Dana Biosphere Reserve Jordan",
+  "feynan": "Feynan Jordan",
+  "afra": "Afra Hot Springs Tafilah Jordan",
+  "busaira": "Busaira archaeological site Jordan",
+  "sela": "Sela Castle Tafilah Jordan",
+  "petra": "Petra archaeological city Jordan",
+  "little-petra": "Little Petra Siq al Barid Jordan",
+  "wadi-rum": "Wadi Rum Jordan",
+  "shobak": "Shobak Castle Jordan",
+  "humayma": "Humayma archaeological site Jordan",
+  "aqaba-fort": "Aqaba Fort Jordan",
+  "ayla": "Ayla Islamic city Aqaba Jordan",
+  "aqaba-marine": "Aqaba Marine Reserve coral reef Jordan",
+  "south-beach": "South Beach Aqaba Jordan",
+  "tala-bay": "Tala Bay Aqaba Jordan"
+};
+const storyFor = (p) => {
+ const kind = /أثري|تاريخ|قلعة|تراث/.test(p.type) ? 'يحفظ هذا المكان طبقات من تاريخ المنطقة، وتكشف معالمه عن حياة الناس والطرق والعمارة التي تعاقبت هنا.' : /ديني/.test(p.type) ? 'يحمل المكان قيمة روحية وثقافية، ويمنح الزائر فرصة للتعرّف إلى تقاليد المنطقة وذاكرتها.' : /بحر|غوص/.test(p.type) ? 'تتصل حكاية المكان بالبحر الأحمر وبيئته الساحلية، حيث تتجاور الطبيعة البحرية والأنشطة الهادئة.' : /متحف|ثقافة/.test(p.type) ? 'يجمع المكان شواهد من ذاكرة المجتمع المحلي، ويقدّم مدخلاً لفهم تاريخ المنطقة وتراثها.' : 'ترتبط حكاية المكان بطبيعة الأردن المتنوعة؛ من الجبال والأودية إلى الموائل البرية والمشاهد المفتوحة.';
+ return p.description + ' ' + kind + ' تستحق الزيارة التمهّل في مشاهدة تفاصيل الموقع واحترام بيئته وموروثه، واتباع تعليمات الجهة المسؤولة قبل الدخول أو ممارسة أي نشاط.';
+};
+export const attractions = attractionsRaw.map(p=>({...p,story:storyFor(p),galleryQuery:galleryQueries[p.id] || (p.name+' Jordan')}));
 export const categories = ['الكل','أثري وتاريخي','قلعة وتاريخ','طبيعة ومغامرة','طبيعة','ديني وأثري','ديني وتاريخي','بحر واستجمام','متحف وثقافة','تراث وعمارة','طبيعة واستجمام','حياة برية','طبيعة وطيور','أثري وتراث عالمي'];
